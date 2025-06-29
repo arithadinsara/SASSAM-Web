@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+    <title>Contact Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+@keyframes gradient {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.animate-gradient {
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+}
+
+@keyframes wave {
+    0%, 100% { transform: translateX(1); }
+    25% { transform: translateX(-25%); }
+    50% { transform: translateX(-50%); }
+    75% { transform: translateX(-25%); }
+}
+
+.animate-wave {
+    animation: wave 10s -3s linear infinite;
+}
+
+.animate-wave.reverse {
+    animation: wave 18s linear reverse infinite;
+}
+</style>
+<body class="flex flex-col items-center min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+        <ul class="flex gap-4 cursor-pointer">
+            <li><a href="{% url 'home'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HOME</a></li>
+            <li><a href="{% url 'help'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HELP</a></li>
+            <li><a href="{% url 'contact'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">CONTACT</a></li>
+        </ul>
+    </nav>
+    <br>
+    <br>
+    
+ 	<!-- Contact Section -->
+     <div class="flex flex-col items-center justify-center flex-grow text-white">
+        
+            <h1 class="mb-4 text-5xl font-bold underline">Contact Us</h1>
+            <p class="mb-4">If you have any questions or need assistance, please feel free to reach out to us.</p>
+            <h2 class="items-center mb-4 text-2xl font-semibold">Contact Information</h2>
+            <ul class="mb-8">
+                <li class="items-center mb-2"><strong>Email:</strong> info@lnbti.lk</li>
+                <li class="items-center mb-2"><strong>Phone:</strong> +94 77 336 0000 / +94 11 208 8822</li>
+                <li class="items-center"><strong>Address:</strong> 278, High Level Road, Maharagama, Sri Lanka</li>
+            </ul>
+        </div>     
+            <!-- Content -->
+    
+        <div class="items-center w-full max-w-3xl space-y-8 shadow-2xl bg-slate-300/55 md:flex-row rounded-2xl p-11 md:space-y-0 md:space-x-8 md:w-2/5">
+        <div class="text-center text-white content">
+            <form action="" class="items-center">
+                <label for="username" class="mb-2 text-lg font-semibold text-black ">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Username" class="w-full p-2 text-gray-900 border-black rounded shadow focus:outline-none">
+               
+                    <label for="email" class="block mt-2 text-lg font-semibold text-black">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" class="w-full p-2 text-gray-900 rounded shadow focus:outline-none">
+                
+                    <label for="message" class="block mt-2 text-lg font-semibold text-black">Message</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Your message" class="w-full p-2 text-gray-900 rounded shadow focus:outline-none"></textarea>
+                
+                <button type="submit" class="w-full py-2 mt-6 font-bold text-purple-900 bg-white rounded shadow hover:bg-purple-800 hover:text-white">Submit</button>
+            </form>
+        </div>
+    </div>
+    
+    
+    
+
+    <!-- Footer -->
+    <div class="w-full p-4 mt-auto text-center bg-white/20">
+        <p class="text-white">&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p class="text-white">Design and Development by LNBTI</p>
+    </div>
+
+</body>
+</html>
+
+

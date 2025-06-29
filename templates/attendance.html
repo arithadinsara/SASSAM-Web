@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance Dashboard | By Code Info</title>
+  <link rel="stylesheet" href="{% static 'css/attend.css' %}" />
+  <!-- Font Awesome Cdn Link -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <ul>
+        <li><a href="#" class="logo">
+          <img src="{% static 'pic/logo.jpg' %}">
+          <span class="nav-item">Admin</span>
+        </a></li>
+        <li><a href="#">
+          <i class="fas fa-menorah"></i>
+          <span class="nav-item">Dashboard</span>
+        </a></li>
+        <li><a href="#">
+          <i class="fas fa-comment"></i>
+          <span class="nav-item">Message</span>
+        </a></li>
+        <li><a href="#">
+          <i class="fas fa-database"></i>
+          <span class="nav-item">Report</span>
+        </a></li>
+        <li><a href="#">
+          <i class="fas fa-chart-bar"></i>
+          <span class="nav-item">Attendance</span>
+        </a></li>
+        <li><a href="#">
+          <i class="fas fa-cog"></i>
+          <span class="nav-item">Setting</span>
+        </a></li>
+        <li><a href="#" class="logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="nav-item">Log out</span>
+        </a></li>
+      </ul>
+    </nav>
+
+    <section class="main">
+      <div class="main-top">
+        <h1>Attendance</h1>
+        <i class="fas fa-user-cog"></i>
+      </div>
+
+      <div class="content">
+        <section class="attendance">
+          <div class="attendance-list">
+            <h1>Attendance List</h1>
+            <table class="table table-bordered mt-4">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>ID</th>
+                  <th>Batch</th>
+                  <th>PIN Number</th>
+                  <th>Fingerprint</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="student-table-body">
+                <!-- Data from Firebase will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="form-container">
+          <form id="search-student-form" class="search-container">
+            <div class="form-group">
+                <label for="search">Search Students</label>
+                <input type="text" class="form-control" id="search" placeholder="Enter name or ID">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="searchStudents()">Search</button>
+          </form>
+
+          <form id="add-student-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+              <label for="stdid">Student ID</label>
+              <input type="text" class="form-control" id="stdid" required>
+            </div>
+            <div class="form-group">
+              <label for="fingerid">Fingerprint ID</label>
+              <button type="button" class="btn btn-secondary" id="scan-fingerprint">Scan</button>
+            </div>
+            <div class="form-group">
+              <label for="batch">Batch</label>
+              <input type="text" class="form-control" id="batch" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="add-student-button" disabled>Add Student</button>
+          </form>
+          
+        </div>
+      </div>
+
+      <div class="users">
+        <div class="card" style="display: none;">
+          <img src="{% static 'pic/img1.jpg' %}" id="user-img">
+          <h4 id="user-name">Sam David</h4>
+          <p id="user-role">UI Designer</p>
+          <div class="per">
+            <table>
+              <tr>
+                <td><span>85%</span></td>
+                <td><span>87%</span></td>
+              </tr>
+              <tr>
+                <td>Month</td>
+                <td>Year</td>
+              </tr>
+            </table>
+          </div>
+          <button onclick="hideUserCard()">Close</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Initialize Firebase
+      var firebaseConfig = {
+        apiKey: "AIzaSyDZ_QbaOImpXwmgwdlwKXUyz6h6UTt1NJA",
+        authDomain: "fingerprint-attendance-s-1471d.firebaseapp.com",
+        databaseURL: "https://fingerprint-attendance-s-1471d-default-rtdb.firebaseio.com",
+        projectId: "fingerprint-attendance-s-1471d",
+        storageBucket: "fingerprint-attendance-s-1471d.appspot.com",
+        messagingSenderId: "676266590002",
+        appId: "1:676266590002:web:b0a9056b63aa521a56a12b",
+        measurementId: "G-WT080WED4F"
+      };
+      firebase.initializeApp(firebaseConfig);
+  
+      const dbRef = firebase.database().ref("Student");
+
+      // Fetch data from Firebase
+      function fetchStudents() {
+        dbRef.once("value", function(snapshot) {
+          var students = snapshot.val();
+          var tableBody = document.getElementById('student-table-body');
+          tableBody.innerHTML = ''; // Clear existing table rows
+
+          for (var id in students) {
+            if (students.hasOwnProperty(id)) {
+              var student = students[id];
+              var newRow = document.createElement('tr');
+              newRow.id = `row-${id}`;
+
+              newRow.innerHTML = `
+                <td>${student.Name}</td>
+                <td>${student.ID}</td>
+                <td>${student.Batch}</td>
+                <td>${student.PinNumber}</td>
+                <td>${student.FingerprintId ? 'Scanned' : 'Not Scanned'}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm" onclick="viewStudent('${id}')">View</button>
+                  <button class="btn btn-danger btn-sm" onclick="loadStudentData('${id}')">Update</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteStudent('${id}', this)">Delete</button>
+                </td>
+              `;
+
+              tableBody.appendChild(newRow);
+            }
+          }
+        });
+      }
+
+      fetchStudents(); // Fetch students on page load
+
+      // Enable Add Student button only when all required fields are filled
+      const form = document.getElementById('add-student-form');
+      const addButton = document.getElementById('add-student-button');
+      const inputs = form.querySelectorAll('input[required]');
+      const scanButton = document.getElementById('scan-fingerprint');
+      const userCard = document.querySelector('.card');
+      const formContainer = document.querySelector('.form-container');
+
+      inputs.forEach(input => {
+        input.addEventListener('input', () => {
+          let allFilled = true;
+          inputs.forEach(i => {
+            if (!i.value) {
+              allFilled = false;
+            }
+          });
+          addButton.disabled = !allFilled;
+        });
+      });
+
+      scanButton.addEventListener('click', function() {
+        // Simulate scanning process and update the label
+        scanButton.disabled = true;
+        scanButton.textContent = "Scanned";
+      });
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const stdid = document.getElementById('stdid').value; // Use the entered student ID
+        const batch = document.getElementById('batch').value;
+        const pinNumber = generatePIN();
+        const fingerprintId = scanButton.textContent === "Scanned" ? "Fingerprint data" : "";
+
+        const isUpdate = addButton.textContent === 'Save';
+
+        if (isUpdate) {
+          dbRef.child(stdid).update({
+            Name: name,
+            Batch: batch,
+            PinNumber: pinNumber,
+            FingerprintId: fingerprintId
+          }, function(error) {
+            if (error) {
+              alert("Data could not be updated." + error);
+            } else {
+              alert("Data updated successfully.");
+              resetForm();
+              fetchStudents();
+            }
+          });
+        } else {
+          // Check if the student ID already exists
+          dbRef.child(stdid).once("value", function(snapshot) {
+            if (snapshot.exists()) {
+              alert("Student ID already exists. Please use a different ID.");
+            } else {
+              // Add the new student to Firebase
+              dbRef.child(stdid).set({
+                Name: name,
+                ID: stdid,
+                Batch: batch,
+                PinNumber: pinNumber,
+                FingerprintId: fingerprintId
+              }, function(error) {
+                if (error) {
+                  alert("Data could not be saved." + error);
+                } else {
+                  alert("Data saved successfully.");
+                  resetForm();
+                  fetchStudents();
+                }
+              });
+            }
+          });
+        }
+      });
+
+      // Load student data into the form for updating
+      window.loadStudentData = function(id) {
+        dbRef.child(id).once("value", function(snapshot) {
+          var student = snapshot.val();
+          if (student) {
+            document.getElementById('name').value = student.Name;
+            document.getElementById('stdid').value = student.ID;
+            document.getElementById('batch').value = student.Batch;
+            document.getElementById('stdid').disabled = true; // Disable ID field to prevent changes
+            scanButton.textContent = student.FingerprintId ? "Scanned" : "Scan";
+            scanButton.disabled = student.FingerprintId ? true : false;
+            addButton.textContent = 'Save';
+          }
+        });
+      }
+
+      // Reset form
+      function resetForm() {
+        form.reset();
+        scanButton.textContent = "Scan";
+        scanButton.disabled = false;
+        document.getElementById('stdid').disabled = false;
+        addButton.textContent = 'Add Student';
+      }
+
+      // Generate PIN Number
+      function generatePIN() {
+        return Math.floor(1000 + Math.random() * 9000); // Random 4-digit number
+      }
+
+      // Delete student
+      window.deleteStudent = function(id, button) {
+        if (confirm("Are you sure you want to delete this student?")) {
+          dbRef.child(id).remove(function(error) {
+            if (error) {
+              alert("Data could not be deleted." + error);
+            } else {
+              alert("Data deleted successfully.");
+              var row = button.parentNode.parentNode;
+              row.parentNode.removeChild(row);
+            }
+          });
+        }
+      }
+
+      // View student details
+      window.viewStudent = function(id) {
+        dbRef.child(id).once("value", function(snapshot) {
+          var student = snapshot.val();
+          if (student) {
+            userCard.style.display = 'block';
+            document.getElementById('user-name').textContent = student.Name;
+            document.getElementById('user-role').textContent = `ID: ${student.ID}, Batch: ${student.Batch}, PIN: ${student.PinNumber}`;
+          }
+        });
+      }
+
+      // Hide user card
+      window.hideUserCard = function() {
+        userCard.style.display = 'none';
+      }
+
+      // Search students
+      window.searchStudents = function() {
+        var searchInput = document.getElementById('search').value.toLowerCase();
+        var tableRows = document.querySelectorAll('#student-table-body tr');
+
+        tableRows.forEach(function(row) {
+          var name = row.cells[0].textContent.toLowerCase();
+          var id = row.cells[1].textContent.toLowerCase();
+          if (name.includes(searchInput) || id.includes(searchInput)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

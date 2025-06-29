@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+    <title>Student Registration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    @keyframes gradient {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 0%; }
+    }
+    
+    .animate-gradient {
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: translateX(1); }
+        25% { transform: translateX(-25%); }
+        50% { transform: translateX(-50%); }
+        75% { transform: translateX(-25%); }
+    }
+    
+    .animate-wave {
+        animation: wave 10s -3s linear infinite;
+    }
+    
+    .animate-wave.reverse {
+        animation: wave 18s linear reverse infinite;
+    }
+    </style>
+<body class="flex flex-col items-center min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+        <ul class="flex gap-4 cursor-pointer">
+            <li><a href="home_page.html" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HOME</a></li>
+            <li><a href="help_page.html" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HELP</a></li>
+            <li><a href="contact_page.html" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">CONTACT</a></li>
+        </ul>
+    </nav>
+    <br>
+    <br>
+    
+    <!-- Content -->
+    <section class="flex items-center justify-center flex-grow">
+        <!-- Login container -->
+        <div class="flex flex-col w-full max-w-3xl space-y-8 shadow-2xl bg-slate-300/55 md:flex-row rounded-2xl p-11 md:space-y-0 md:space-x-8 md:w-auto">
+            <!-- Form -->
+            <div class="w-full px-0 border-gray-900 md:w-1/2 md:px-9">
+                <h2 class="text-4xl font-bold text-center text-slate-950">Student Registration</h2>
+
+
+                <form action="" class="flex flex-col items-center">
+                    <label class="w-full mt-4">Username</label>
+                    <input class="w-full p-2 rounded-lg" type="text" name="Username" placeholder="Username">
+
+                    <label class="w-full mt-4">Indexnumber</label>
+                    <input class="w-full p-2 rounded-lg" type="text" name="Indexnumber" placeholder="indexnum">
+
+                    <label class="w-full mt-4">Email</label>
+                    <input class="w-full p-2 rounded-lg" type="text" name="Email" placeholder="Email">
+
+                    <label class="w-full mt-4">Password</label>
+                    <input class="w-full p-2 rounded-lg" type="password" name="Password" placeholder="Password">
+                    <button class="w-full py-2 font-bold text-white bg-purple-800 rounded-lg mt-7">Register</button>
+                </form>
+            </div>
+            <!-- Image -->
+            <div class="flex flex-col items-center w-full md:w-1/2">
+                <img class="mt-12 mb-4 rounded-2xl" src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo">
+                <img class="w-4/5 rounded-2xl" src="Rejistration.png" alt="Admin Image">
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <!-- Footer -->
+    <div class="w-full p-4 mt-auto text-center bg-white/20">
+        <p class="text-white">&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p class="text-white">Design and Development by LNBTI</p>
+    </div>
+</body>
+</html>
+
+

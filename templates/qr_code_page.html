@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+     @keyframes gradient {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 0%; } 
+    }
+    
+    .animate-gradient {
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: translateX(1); }
+        25% { transform: translateX(-25%); }
+        50% { transform: translateX(-50%); }
+        75% { transform: translateX(-25%); }
+    }
+    
+    .animate-wave {
+        animation: wave 10s -3s linear infinite;
+    }
+    
+    .animate-wave.reverse {
+        animation: wave 18s linear reverse infinite;
+    }
+
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+      
+    </nav>
+
+    <div class="max-w-4xl p-4 mx-auto mt-8 rounded-lg shadow-md bg-white/20 ">
+        <h1 class="mb-4 text-2xl font-bold">QR Code Details</h1>
+        <div class="flex justify-between">
+            <div class="details">
+                <div id="details" class="flex-grow mb-4 mr-5">
+                    <p><strong>Batch ID:</strong> <span id="batchId"></span></p>
+                    <p><strong>Lecturer Name:</strong> <span id="lecturerName"></span></p>
+                    <p><strong>Lecture Number:</strong> <span id="lectureNumber"></span></p>
+                    <p><strong>Module Name:</strong> <span id="moduleName"></span></p>
+                    <p><strong>Semester:</strong> <span id="semester"></span></p>
+                </div>
+                <button id="generateQR" class="px-4 py-2 font-bold text-white bg-purple-800 rounded-lg">Generate QR Code</button>
+                <button id="generateQR" class="px-4 py-2 font-bold text-white bg-purple-800 rounded-lg"><a href="{% url 'get_report' %}">Generate Report</a></button>
+                <div id="qrcode" class="flex-grow mt-4 qrcode"></div>
+            </div>
+            <div class="table-container">
+                <h2 class="mt-8 ml-3 text-xl font-bold">Attendance Records</h2>
+                <table id="attendanceTable" class="w-full mt-5 ml-3 border-collapse">
+                    <thead>
+                        <tr>
+                            <th>Index Number</th>
+                            <th>Name</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Firebase data will populate here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="w-full p-4 mt-auto text-center bg-white/20">
+        <p class="text-white">&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p class="text-white">Design and Development by LNBTI</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const queryParams = new URLSearchParams(window.location.search);
+
+            // Get query parameters
+            const batchId = queryParams.get('batchId') || 'N/A';
+            const lecturerName = queryParams.get('lecturerName') || 'N/A';
+            const lectureNumber = queryParams.get('lectureNumber') || 'N/A';
+            const moduleName = queryParams.get('moduleName') || 'N/A';
+            const semester = queryParams.get('semester') || 'N/A';
+
+            // Display details
+            document.getElementById('batchId').textContent = batchId;
+            document.getElementById('lecturerName').textContent = lecturerName;
+            document.getElementById('lectureNumber').textContent = lectureNumber;
+            document.getElementById('moduleName').textContent = moduleName;
+            document.getElementById('semester').textContent = semester;
+
+            // Generate QR code on button click
+            document.getElementById('generateQR').addEventListener('click', function () {
+      const qrText = `{"LecId": "{{ batchId }}", "LecDt": "{{ moduleName }}"}`;
+                console.log('Generating QR Code with data:', qrText);
+
+                // Clear previous QR code
+                const qrcodeElement = document.getElementById('qrcode');
+                qrcodeElement.innerHTML = '';
+
+                // Generate QR code
+                QRCode.toCanvas(document.createElement('canvas'), qrText, function (error, canvas) {
+                    if (error) {
+                        console.error('Error generating QR code:', error);
+                        alert('Failed to generate QR code. Check console for errors.');
+                    } else {
+                        qrcodeElement.appendChild(canvas);
+                        console.log('QR code generated successfully.');
+                    }
+                });
+            });
+
+            // Initialize Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyDZ_QbaOImpXwmgwdlwKXUyz6h6UTt1NJA",
+                authDomain: "fingerprint-attendance-s-1471d.firebaseapp.com",
+                databaseURL: "https://fingerprint-attendance-s-1471d-default-rtdb.firebaseio.com",
+                projectId: "fingerprint-attendance-s-1471d",
+                storageBucket: "fingerprint-attendance-s-1471d.appspot.com",
+                messagingSenderId: "676266590002",
+                appId: "1:676266590002:web:b0a9056b63aa521a56a12b",
+                measurementId: "G-WT080WED4F"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+
+            // Reference to the Firebase database
+            const dbRef = firebase.database().ref('Attendence-QRDetails');
+            
+            // Fetch and display data in the table
+            dbRef.once('value', (snapshot) => {
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';  // Clear existing rows
+
+                snapshot.forEach(childSnapshot => {
+                    const key = childSnapshot.key;
+                    const records = childSnapshot.val();
+
+                    for (let recordKey in records) {
+                        if (records.hasOwnProperty(recordKey)) {
+                            const record = records[recordKey];
+                            const row = document.createElement('tr');
+
+                            const indexNumberCell = document.createElement('td');
+                            indexNumberCell.textContent = record.StudentId;
+                            row.appendChild(indexNumberCell);
+
+                            const nameCell = document.createElement('td');
+                            nameCell.textContent = record.name;
+                            row.appendChild(nameCell);
+
+                            const timestampCell = document.createElement('td');
+                            timestampCell.textContent = record.timestamp;
+                            row.appendChild(timestampCell);
+
+                            tableBody.appendChild(row);
+                        }
+                    }
+                });
+            }, (error) => {
+                console.error('Error fetching data from Firebase:', error);
+            });
+        });
+    </script>
+</body>
+
+</html>

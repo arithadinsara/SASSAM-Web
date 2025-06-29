@@ -1,0 +1,425 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Form with Table and QR Code</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<style>
+     /* Adjust spacing for module cards */
+     #moduleCards {
+    margin-top: 2rem; /* Increase the top margin to provide more space */
+    margin-bottom: 2rem; /* Add bottom margin for spacing */
+    display: block; /* Change to block display for vertical stacking */
+    border-radius: 12px; /* Rounded corners for the card container */
+   
+    padding: 1rem; /* Padding inside the card container */
+    background-color: rgba(181, 175, 233, 0.8); /* Light background color for better visibility */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for added depth */
+}
+.student-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.student-id {
+    font-weight: bold;
+}
+
+.student-name {
+    margin-left: 1rem;
+}
+
+
+.module-card {
+    opacity: 0.9;
+    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem; /* Space between cards */
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+.module-card:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    background-color: rgba(0, 123, 255, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.selected-module {
+    opacity: 1;
+    transform: scale(1.02);
+    background-color: rgba(3, 28, 54, 0.3);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.module-card p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 0%;
+        }
+
+        50% {
+            background-position: 100% 100%;
+        }
+
+        100% {
+            background-position: 0% 0%;
+        }
+    }
+
+    .animate-gradient {
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+    }
+
+    @keyframes wave {
+        0%,
+        100% {
+            transform: translateX(1);
+        }
+
+        25% {
+            transform: translateX(-25%);
+        }
+
+        50% {
+            transform: translateX(-50%);
+        }
+
+        75% {
+            transform: translateX(-25%);
+        }
+    }
+
+    .animate-wave {
+        animation: wave 10s -3s linear infinite;
+    }
+
+    .animate-wave.reverse {
+        animation: wave 18s linear reverse infinite;
+    }
+</style>
+
+<body class="flex flex-col min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+    </nav>
+
+    <div class="flex-grow">
+        <div class="max-w-md p-8 mx-auto mt-8 rounded-lg shadow-md bg-slate-300/55">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="programs" class="block text-lg font-bold text-black">Program</label>
+                    <select id="programs" class="block w-full p-2 mt-1 border-gray-300 rounded-lg shadow-sm" onchange="fetchBatches()">
+                        <option value="">Select an option</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="batches" class="block text-lg font-bold text-black">Batch</label>
+                    <select id="batches" class="block w-full p-2 mt-1 border-gray-300 rounded-lg shadow-sm" onchange="fetchSemester()">
+                        <option value="">Select an option</option>
+                    </select>
+                </div>
+                <div id="moduleCards" class="hidden grid grid-cols-3 gap-4 mt-4">
+                    <!-- Module cards will be dynamically inserted here -->
+                </div>
+               
+                <div>
+                    <label for="lecturerName" class="block text-lg font-bold text-black">Lecturer Name</label>
+                    <input id="lecturerName" type="text" class="block w-full p-2 mt-1 border-gray-300 rounded-lg shadow-sm" disabled>
+                </div>
+                <div>
+                    <label for="lectureNumber" class="block text-lg font-bold text-black">Lecture Number</label>
+                    <input id="lectureNumber" type="text" class="block w-full p-2 mt-1 border-gray-300 rounded-lg shadow-sm" disabled>
+                </div>
+
+                <div>
+                    <label for="semester" class="block text-lg font-bold text-black">Semester</label>
+                    <input id="semester" type="text" class="block w-full p-2 mt-1 border-gray-300 rounded-lg shadow-sm" disabled>
+                </div>
+             
+            </div>
+            <div id="studentList" class="mb-4"><h1>Student List</h1>
+                <!-- Student names will be dynamically inserted here -->
+            </div>
+           
+            <button id="okButton" onclick="redirectToStudentList()" class="w-full py-2 mt-7 font-bold text-white bg-purple-800 rounded-lg" disabled>OK</button>
+        </div>
+
+        <div id="dataTable" class="hidden max-w-4xl mx-auto mt-10">
+            <table class="min-w-full bg-slate-300/55">
+                <thead>
+                    <tr class="font-bold">
+                        <th class="px-4 py-2 border-b border-gray-200">#</th>
+                        <th class="px-4 py-2 border-b border-gray-200">Index Number</th>
+                        <th class="px-4 py-2 border-b border-gray-200">Name</th>
+                        <th class="px-4 py-2 border-b border-gray-200">Time</th>
+                        <th class="px-4 py-2 border-b border-gray-200">Date</th>
+                        <th class="px-4 py-2 border-b border-gray-200">Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically generated -->
+                </tbody>
+            </table>
+            <div class="flex items-center justify-between mt-4">
+                <div>
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)">
+                    <label for="selectAll" class="text-lg text-black">Select All</label>
+                </div>
+                <button onclick="generateQRCode()" class="px-4 py-2 mb-8 font-bold text-white bg-purple-800 rounded-lg">Generate QR Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+
+        // Fetch programs and populate the dropdown
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchPrograms();
+        });
+
+        function fetchPrograms() {
+            fetch('/fetch_programs/')
+                .then(response => response.json())
+                .then(data => {
+                    const programsDropdown = document.getElementById('programs');
+                    programsDropdown.innerHTML = '<option value="">Select an option</option>';
+                    data.programs.forEach(program => {
+                        const option = document.createElement('option');
+                        option.value = program.ProgramId;
+                        option.textContent = program.ProgramName;
+                        programsDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching programs:", error));
+        }
+
+        function fetchBatches() {
+            const programId = document.getElementById('programs').value;
+    if (!programId) return;
+
+    fetch(`/fetch_batches/?program_id=${programId}`)
+        .then(response => response.json())
+        .then(data => {
+            const batchesDropdown = document.getElementById('batches');
+            const okButton = document.getElementById('okButton');
+            batchesDropdown.innerHTML = '<option value="">Select an option</option>';
+            data.batches.forEach(batch => {
+                const option = document.createElement('option');
+                option.value = batch.BatchId;
+                option.textContent = batch.BatchName;
+                batchesDropdown.appendChild(option);
+            });
+            batchesDropdown.disabled = false;
+            okButton.disabled = true; // Disable the OK button initially
+        })
+        .catch(error => console.error("Error fetching batches:", error));
+    }
+       
+    function fetchStudents(batchId) {
+    fetch(`/fetch_students/?batch_id=${batchId}`)
+        .then(response => response.json())
+        .then(data => {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = ''; // Clear existing content
+            
+            // Add "Student List" title
+            const title = document.createElement('h2');
+            title.className = 'text-lg font-bold text-black mb-4';
+            title.textContent = 'Student List';
+            studentList.appendChild(title);
+
+            // Loop through students and display their ID and name
+            data.students.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.className = 'student-item';
+                studentItem.textContent = `${student.StudentId} - ${student.StudentName}`;
+                studentList.appendChild(studentItem);
+            });
+        })
+        .catch(error => console.error("Error fetching students:", error));
+}
+
+function fetchSemester() {
+    const batchId = document.getElementById('batches').value;
+    if (!batchId) return;
+
+    fetch(`/fetch_semester/?batch_id=${batchId}`)
+        .then(response => response.json())
+        .then(data => {
+            const semesterInput = document.getElementById('semester');
+            semesterInput.value = data.semesterNo || 'N/A';
+
+            // Fetch and display modules
+            fetchModules(batchId);
+
+            // Fetch and display students
+            fetchStudents(batchId);
+        })
+        .catch(error => console.error("Error fetching semester:", error));
+}
+
+        function fetchModules(batchId) {
+            fetch(`/fetch_modules/?batch_id=${batchId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const moduleCards = document.getElementById('moduleCards');
+                    moduleCards.innerHTML = '';
+                    moduleCards.classList.remove('hidden');
+
+                    data.modules.forEach(module => {
+                        const card = document.createElement('div');
+                        card.className = 'module-card';
+                        card.textContent = module.ModuleName;
+                        card.onclick = () => selectModule(card, module.ModuleId);
+                        moduleCards.appendChild(card);
+                    });
+                })
+                .catch(error => console.error("Error fetching modules:", error));
+        }
+
+        function selectModule(card, moduleId) {
+            const allCards = document.querySelectorAll('.module-card');
+            allCards.forEach(c => c.classList.remove('selected-module'));
+            card.classList.add('selected-module');
+            document.getElementById('okButton').disabled = false;
+            fetchLecturerName(moduleId);
+            fetchLectureNumber(moduleId); // Assuming you fetch the lecture number when a module is selected
+        }
+
+        function fetchLecturerName(moduleId) {
+            fetch(`/fetch_lecturer_name/?module_id=${moduleId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const lecturerNameInput = document.getElementById('lecturerName');
+                    lecturerNameInput.value = data.lecturerName || 'N/A';
+                })
+                .catch(error => console.error("Error fetching lecturer name:", error));
+        }
+
+        function fetchLectureNumber(moduleId) {
+            fetch(`/fetch_lecture_number/?module_id=${moduleId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const lectureNumberInput = document.getElementById('lectureNumber');
+                    lectureNumberInput.value = data.lectureNumber || 'N/A';
+                })
+                .catch(error => console.error("Error fetching lecture number:", error));
+        }
+        function displayTable() {
+    // Gather necessary data from the form
+    const batchId = document.getElementById('batches').value;
+    const lecturerName = document.getElementById('lecturerName').value;
+    const lectureNumber = document.getElementById('lectureNumber').value;
+    const semester = document.getElementById('semester').value;
+    const selectedModule = document.querySelector('.selected-module');
+    const moduleName = selectedModule ? selectedModule.textContent : '';
+
+    // Gather student data
+    const students = [];
+    
+    document.querySelectorAll('#studentList .student-name').forEach(studentElement => {
+        students.push(studentElement.textContent);
+    });
+
+    // Store student data in session storage
+    sessionStorage.setItem('studentData', JSON.stringify(students));
+
+    // Create URL with query parameters
+    const queryParams = new URLSearchParams({
+        batchId,
+        lecturerName,
+        lectureNumber,
+        moduleName,
+        semester
+    }).toString();
+
+    // Redirect to QR code page with parameters
+    window.location.href = `/qr_code_page/?${queryParams}`;
+}
+
+function goToQRCodePage() {
+    const batchId = document.getElementById('batchId').value;
+    const lecturerName = document.getElementById('lecturerName').value;
+    const lectureNumber = document.getElementById('lectureNumber').value;
+    const moduleName = document.getElementById('moduleName').value;
+    const semester = document.getElementById('semester').value;
+    
+    // Serialize student data
+    fetchStudents(batchId).then(data => {
+        const studentList = encodeURIComponent(JSON.stringify(data.students));
+        // Construct the URL with student data
+        const url = `/qr_code_page/?batchId=${batchId}&lecturerName=${lecturerName}&lectureNumber=${lectureNumber}&moduleName=${moduleName}&semester=${semester}&students=${studentList}`;
+        window.location.href = url;
+    });
+}
+
+function fetchStudents(batchId) {
+    return fetch(`/fetch_students/?batch_id=${batchId}`)
+        .then(response => response.json());
+}
+
+
+        function toggleSelectAll(selectAllCheckbox) {
+            const checkboxes = document.querySelectorAll('.present-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        function redirectToStudentList() {
+    const batchId = document.getElementById('batches').value;
+    const lecturerName = document.getElementById('lecturerName').value;
+    const lectureNumber = document.getElementById('lectureNumber').value;
+    // Get the selected module from the cards
+    const selectedModuleElement = document.querySelector('.selected-module');
+    const moduleName = selectedModuleElement ? selectedModuleElement.textContent.trim() : ''; // Trim any extra spaces
+    const semester = document.getElementById('semester').value;
+
+    // Build the URL with query parameters
+    const url = `/students_list/?batchId=${encodeURIComponent(batchId)}&lecturerName=${encodeURIComponent(lecturerName)}&lectureNumber=${encodeURIComponent(lectureNumber)}&moduleName=${encodeURIComponent(moduleName)}&semester=${encodeURIComponent(semester)}`;
+
+    // Redirect to the URL with parameters
+    window.location.href = url;
+}
+
+
+
+    </script>
+</body>
+
+</html>

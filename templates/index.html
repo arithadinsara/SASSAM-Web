@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+    <title>Lnbt-Student Attendance Managment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+@keyframes gradient {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.animate-gradient {
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+}
+
+@keyframes wave {
+    0%, 100% { transform: translateX(1); }
+    25% { transform: translateX(-25%); }
+    50% { transform: translateX(-50%); }
+    75% { transform: translateX(-25%); }
+}
+
+.animate-wave {
+    animation: wave 10s -3s linear infinite;
+}
+
+.animate-wave.reverse {
+    animation: wave 18s linear reverse infinite;
+}
+</style>
+<body class="flex flex-col items-center min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+        <a href="{% url 'login' %}">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/user-menu-icon.png" alt="LNBTI Logo" class="h-12 cursor-pointer hover:scale-125">
+        </a>
+    </nav>
+    
+ 	<!-- Content -->
+    <div class="flex items-center justify-center flex-grow">
+        <div class="text-center text-purple-950 content">
+            <p class="mb-2 text-5xl font-bold">ランカ日本ビズテック研究所 <br>学生出席管理システムへようこそ.</p>
+            <p class="mt-12 mb-4 text-5xl font-bold">Welcome to our,</p>
+            <h1 class="mb-8 text-5xl font-bold">Student Attendance <br> Management System</h1>
+            
+        </div>
+    </div>
+    
+
+    <!-- Footer -->
+    <div class="w-full p-4 mt-auto text-center bg-white/20">
+        <p class="text-white">&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p class="text-white">Design and Development by LNBTI</p>
+    </div>
+
+	<script>
+       
+    </script> 
+</body>
+</html>
+
+

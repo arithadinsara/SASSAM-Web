@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Page</title>
+    <link rel="stylesheet" href="{% static 'css/qr.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>QR Code for {{ module_name }}</h1>
+            <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
+        </div>
+        <p>Lecturer: {{ lecturer_name }}</p>
+        <form id="qr-form">
+            <div class="form-group">
+                <label for="lectureNumber">Lecture Number:</label>
+                <input type="text" id="lectureNumber" name="lectureNumber" value="L001" readonly>
+            </div>
+            
+        </form>
+        <div id="qr-code">
+            <!-- The QR code will be generated here -->
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>LectureId</th>
+                    <th>Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample row, repeat this for each student -->
+                <tr>
+                    <td>uog0322067</td>
+                    <td>Aritha Dinsara</td>
+                    <td>09:00 AM</td>
+                    <td>L001</td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+        <button class="mark-attendance-btn">Mark Attendance</button>
+    </div>
+    <script>
+        function generateQRCode() {
+    var lectureNumber = document.getElementById("lectureNumber").value;
+
+    var moduleName = "{{ module_name }}";
+    var lecturerName = "{{ lecturer_name }}";
+
+    var qrData = `Lecture Number: ${lectureNumber}, Module: ${moduleName}, Lecturer Name: ${lecturerName}`;
+
+    var qrCodeContainer = document.getElementById("qr-code");
+    qrCodeContainer.innerHTML = ""; // Clear any existing QR code
+
+    var qrCode = new QRCode(qrCodeContainer, {
+        text: qrData,
+        width: 128,
+        height: 128
+    });
+}
+
+    </script>
+</body>
+</html>

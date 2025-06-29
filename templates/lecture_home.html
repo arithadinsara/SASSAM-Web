@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+    <title>Lecturer_home_page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    @keyframes gradient {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 0%; }
+    }
+    
+    .animate-gradient {
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: translateX(1); }
+        25% { transform: translateX(-25%); }
+        50% { transform: translateX(-50%); }
+        75% { transform: translateX(-25%); }
+    }
+    
+    .animate-wave {
+        animation: wave 10s -3s linear infinite;
+    }
+    
+    .animate-wave.reverse {
+        animation: wave 18s linear reverse infinite;
+    }
+    </style>
+<body class="flex flex-col min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="pl-2 h-14">
+    </nav>
+
+    <!-- Form Content -->
+    <div class="flex items-center justify-center flex-grow">
+        <form action="" method="post" class="flex flex-col items-center p-8 mx-auto border rounded-lg shadow-lg backdrop-blur-md bg-slate-300/55 border-white/10 md:w-1/2">
+            <h1 class="mb-4 text-2xl font-bold text-black">Create QR Code</h1>
+            <button class="w-3/12 py-2 mt-2 font-semibold text-gray-900 border border-white rounded bg-white/25 hover:bg-purple-800 hover:border-white hover:text-white" type="button" onclick="navigateToQR()">Create</button>
+            <h1 class="mt-8 mb-4 text-2xl font-bold text-black ">View Student Attendance</h1>
+            <button class="w-3/12 py-2 mt-2 font-semibold text-gray-900 border border-white rounded bg-white/25 hover:bg-purple-800 hover:border-white hover:text-white" type="button" onclick="navigateToView()">View</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="w-full py-4 mt-auto text-center text-white bg-white/20 footer">
+        <p>&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p>Design and Development by LNBTI</p>
+    </div>
+
+    <script>
+        function navigateToQR() {
+            window.location.href = "qr_page.html"; // it moves to the QR creating page
+        }
+      
+        function navigateToView() {
+            window.location.href = "view_details.html"; // it moves to the view page
+        }
+    </script> 
+</body>
+</html>

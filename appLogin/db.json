@@ -1,0 +1,11 @@
+{
+    "programs": [
+      { "id": 1, "ProgramName": "Computer Science" },
+      { "id": 2, "ProgramName": "Information Technology" }
+    ],
+    "batches": [
+      { "id": 1, "BatchName": "2024", "ProgramId": 1 },
+      { "id": 2, "BatchName": "2025", "ProgramId": 2 }
+    ]
+  }
+  

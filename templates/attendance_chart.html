@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> <!-- Plugin for data labels -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+   
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        
+        .animate-gradient {
+            animation: gradient 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: translateX(1); }
+            25% { transform: translateX(-25%); }
+            50% { transform: translateX(-50%); }
+            75% { transform: translateX(-25%); }
+        }
+        
+        .animate-wave {
+            animation: wave 10s -3s linear infinite;
+        }
+        
+        .animate-wave.reverse {
+            animation: wave 18s linear reverse infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { background-color: black; }
+            50% { background-color: white; }
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        /* Custom styles for transparency and card appearance */
+        .card {
+            border: 1px solid rgba(243, 243, 243, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px;
+            width: 300px;
+            display: inline-block;
+            text-align: center;
+            background-color: rgba(243, 243, 243, 0.8); /* Semi-transparent grey */
+            opacity: 0.8;
+            transition: transform 0.3s, background-color 0.3s, border 0.3s;
+            color: black; /* Set all text inside card to black */
+        }
+        
+        .card:hover {
+            background-color: rgba(243, 243, 243, 1); /* Full opacity on hover */
+            border: 1px solid rgba(128, 128, 128, 1); /* Grey border with high opacity */
+            color: #5c5c5c; /* Dark text color for contrast */
+            transform: scale(1.05); /* Slightly increase size */
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        </style>
+</head>
+<body class="flex flex-col min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    
+    <h1 class="text-center text-white text-4xl py-6">Student Attendance Charts</h1>
+
+    <div class="flex flex-wrap justify-center">
+        <!-- Loop through the student data and create a card for each student -->
+        {% for student, details in student_data.items %}
+            <div class="card border border-gray-500 rounded-lg shadow-lg m-4 p-4 w-80 text-center">
+                <h3 class="text-lg font-semibold">{{ student }}</h3>
+                <p>ID: {{ details.student_id }}</p>
+                <p>Absences: {{ details.absences }}</p>
+                <canvas id="attendanceChart_{{ forloop.counter }}" width="200" height="200"></canvas>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Button placed under the cards -->
+    <div class="flex justify-center mt-6">
+        <button id="downloadPdf" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out" style="height: 40px; line-height: 1;">
+            Download PDF
+        </button>
+    </div>
+    
+   
+    
+    
+    
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const { jsPDF } = window.jspdf;
+
+            // Get data passed from the view
+            const studentData = {{ student_data|safe }};
+
+            // Initialize Chart.js charts with attendance percentages inside the circle
+            Object.keys(studentData).forEach((student, index) => {
+                const ctx = document.getElementById(`attendanceChart_${index + 1}`).getContext('2d');
+                const attendanceChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Attendance %', 'Absence %'],
+                        datasets: [{
+                            data: [
+                                studentData[student].attendance_percentage, 
+                                100 - studentData[student].attendance_percentage
+                            ],
+                            backgroundColor: [
+                                'rgba(108, 99, 255, 1)',  /* Purple for attendance */
+                                'rgba(255, 159, 64, 1)',  /* Orange for absences */
+                            ],
+                            borderColor: [
+                                'rgba(108, 99, 255, 0.6)', /* Light purple */
+                                'rgba(255, 159, 64, 0.6)', /* Light orange */
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#333'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: `Attendance Chart for ${student}`,
+                                color: '#6c63ff'
+                            },
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    // Display percentage for attendance only
+                                    return ctx.dataIndex === 0 ? `${value}%` : ''; 
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 18
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels] // Enable data labels inside the chart
+                });
+            });
+
+            document.getElementById('downloadPdf').addEventListener('click', async function() {
+                const doc = new jsPDF({
+                    backgroundColor: '#000000' // Black background for the whole PDF
+                });
+                
+                const charts = [];
+                
+                // Wait for all charts to be rendered
+                Object.keys(studentData).forEach((student, index) => {
+                    const canvas = document.getElementById(`attendanceChart_${index + 1}`);
+                    if (canvas) {
+                        const chartImage = canvas.toDataURL('image/png');
+                        charts.push({
+                            image: chartImage,
+                            student: student,
+                            id: studentData[student].student_id,
+                            absences: studentData[student].absences,
+                            attendancePercentage: studentData[student].attendance_percentage
+                        });
+                    }
+                });
+
+                // Set the background to black on the first page
+                doc.setFillColor(37, 150, 190);
+                doc.rect(0, 0, 210, 297, 'F'); // Fill the entire page
+
+                // Set font to white and use modern font style
+                doc.setTextColor(0, 0, 0); // White text
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(20);
+                doc.text('Student Attendance Report', 20, 20);
+
+                // Add first student's details to the first page
+                doc.setFontSize(16);
+                doc.text(`Student: ${charts[0].student}`, 20, 40);
+                doc.text(`ID: ${charts[0].id}`, 20, 50);
+                doc.text(`Absences: ${charts[0].absences}`, 20, 60);
+                doc.text(`Attendance Percentage: ${charts[0].attendancePercentage}%`, 20, 70);
+                doc.addImage(charts[0].image, 'PNG', 20, 80, 160, 160); // Display chart with percentage in circle
+
+                // Add other student data to new pages
+                charts.slice(1).forEach((chart, index) => {
+                    doc.addPage();
+                    // Set black background on new page
+                    doc.setFillColor(37, 150, 190); 
+                    doc.rect(0, 0, 210, 297, 'F'); // Fill background
+
+                    // Set text to white
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(16);
+                    doc.text(`Student: ${chart.student}`, 20, 40);
+                    doc.text(`ID: ${chart.id}`, 20, 50);
+                    doc.text(`Absences: ${chart.absences}`, 20, 60);
+                    doc.text(`Attendance Percentage: ${chart.attendancePercentage}%`, 20, 70);
+
+                    // Add chart image with percentage in circle
+                    doc.addImage(chart.image, 'PNG', 20, 80, 160, 160);
+                });
+
+                doc.save('attendance_report_with_percentages.pdf');
+            });
+        });
+        
+    </script>
+    
+</body>
+
+</html>

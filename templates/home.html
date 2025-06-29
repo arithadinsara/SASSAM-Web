@@ -1,0 +1,143 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        
+        .animate-gradient {
+            animation: gradient 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: translateX(1); }
+            25% { transform: translateX(-25%); }
+            50% { transform: translateX(-50%); }
+            75% { transform: translateX(-25%); }
+        }
+        
+        .animate-wave {
+            animation: wave 10s -3s linear infinite;
+        }
+        
+        .animate-wave.reverse {
+            animation: wave 18s linear reverse infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { background-color: black; }
+            50% { background-color: white; }
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen overflow-x-hidden bg-fixed bg-gradient-to-r from-purple-900 via-purple-400 to-purple-800 animate-gradient">
+    <!-- Wave Animation -->
+    <div class="fixed bottom-0 left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-60 animate-wave z-[-1]"></div>
+    <div class="fixed bottom-[-1.25em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-70 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-80 animate-wave reverse z-[-1]"></div>
+    <div class="fixed bottom-[-2.5em] left-0 w-[200%] h-60 bg-white/25 rounded-[1000%_1000%_0_0] opacity-90 animate-wave reverse z-[-1]"></div>
+
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between w-full h-20 px-10 shadow-md bg-white/20">
+        <img src="https://lnbti.lk/wp-content/themes/lnbti-theme-child/images/logonew.png" alt="LNBTI Logo" class="h-14">
+        <ul class="flex gap-4 cursor-pointer">
+            <li><a href="{% url 'home'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HOME</a></li>
+            <li><a href="{% url 'help'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">HELP</a></li>
+            <li><a href="{% url 'contact'%}" class="px-4 py-2 text-white rounded-lg hover:bg-gray-700">CONTACT</a></li>
+        </ul>
+    </nav>
+
+    <!-- Welcome Message -->
+    <div>
+       <h1 class="p-4 mt-3 text-4xl font-bold text-left text-white">HI ADMIN >>>,</h1> 
+    </div>
+
+    <!-- Slideshow container -->
+    <div class="relative max-w-4xl mx-auto my-5">
+        <div class="hidden mySlides fade">
+            <div class="text-center numbertext">1 / 4</div>
+            <a href="{% url 'attendance' %}">
+                <img src="{% static 'images/Rejistration.png' %}" alt="Slide 1" class="mx-auto my-10 transition-transform duration-500 transform border-8 rounded-lg shadow-lg border-white/30 hover:scale-125 hover:border-black">
+            </a>
+            <div class="p-2 text-lg font-bold text-center bg-pink-400 bg-opacity-60">Register New Student</div>
+        </div>
+
+        <div class="hidden mySlides fade">
+            <div class="text-center numbertext">2 / 4</div>
+            <a href="{% url 'attendance' %}">
+                <img src="{% static 'images/Rejistration.png' %}" alt="Slide 2" class="mx-auto my-10 transition-transform duration-500 transform border-8 rounded-lg shadow-lg border-white/30 hover:scale-125 hover:border-black">
+            </a>
+            <div class="p-2 text-lg font-bold text-center bg-pink-400 bg-opacity-60">Manage Student Information</div>
+        </div>
+
+        <div class="hidden mySlides fade">
+            <div class="text-center numbertext">3 / 4</div>
+            <img src="{% static 'images/K.jpg' %}" alt="Slide 3" class="mx-auto my-5 transition-transform duration-500 transform border-8 rounded-lg shadow-lg border-white/30 hover:scale-125 hover:border-black">
+            <div class="p-2 text-lg font-bold text-center bg-pink-400 bg-opacity-60">Caption Three</div>
+        </div>
+
+        <div class="hidden mySlides fade">
+            <div class="text-center numbertext">4 / 4</div>
+            <img src="{% static 'images/K.jpg' %}" alt="Slide 4" class="mx-auto my-5 transition-transform duration-500 transform border-8 rounded-lg shadow-lg border-white/30 hover:scale-125 hover:border-black">
+            <div class="p-2 text-lg font-bold text-center bg-pink-400 bg-opacity-60">Caption Four</div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <span class="inline-block w-4 h-4 mx-1 bg-white rounded-full cursor-pointer dot" onclick="currentSlide(1)"></span>
+        <span class="inline-block w-4 h-4 mx-1 bg-white rounded-full cursor-pointer dot" onclick="currentSlide(2)"></span>
+        <span class="inline-block w-4 h-4 mx-1 bg-white rounded-full cursor-pointer dot" onclick="currentSlide(3)"></span>
+        <span class="inline-block w-4 h-4 mx-1 bg-white rounded-full cursor-pointer dot" onclick="currentSlide(4)"></span>
+
+        <a class="absolute w-12 p-4 text-xl font-bold text-center text-white transform -translate-y-1/2 bg-black bg-opacity-50 cursor-pointer left-56 prev top-1/2" onclick="plusSlides(-1)">❮</a>
+        <a class="absolute w-12 p-4 text-xl font-bold text-center text-white transform -translate-y-1/2 bg-black bg-opacity-50 cursor-pointer right-56 next top-1/2" onclick="plusSlides(1)">❯</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="w-full p-4 mt-auto text-center bg-white/20">
+        <p class="text-white">&copy; 2024 LNBTI Japanese IT University. BIO-METRIC ATTENDANCE All rights reserved.</p>
+        <p class="text-white">Design and Development by LNBTI</p>
+    </div>
+
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) { slideIndex = 1 }    
+            if (n < 1) { slideIndex = slides.length }
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";  
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].classList.remove("blink");
+            }
+            slides[slideIndex-1].style.display = "block";  
+            dots[slideIndex-1].classList.add("blink");
+        }
+
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+    </script>
+</body>
+</html>
