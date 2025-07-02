@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "676266590002",
+    "firebase_url": "https://fingerprint-attendance-s-1471d-default-rtdb.firebaseio.com",
+    "project_id": "fingerprint-attendance-s-1471d",
+    "storage_bucket": "fingerprint-attendance-s-1471d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676266590002:android:483a654e0c1ec68e56a12b",
+        "android_client_info": {
+          "package_name": "com.example.untitled3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA88oQ7UPHXLdfjp91xRZd2EglhLSMTM2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
